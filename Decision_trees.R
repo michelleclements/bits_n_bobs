@@ -10,6 +10,7 @@
 #' I have borrowed heavily from 
 #' * Hands-On machine learning with scikit-learn and tensorflow by Aurelien Geron
 #' * https://rstudio-pubs-static.s3.amazonaws.com/195428_16074a4e980747c4bc05af6c0bb305a9.html
+#' This one could be useful: https://rpubs.com/saqib/rpart
 #' 
 #' 
 #' ## Building a single decision tree using Caret
@@ -118,7 +119,7 @@ iris_results <- iris_results %>%
 #' ## Random forests
 #' Random Forests use bagging/pasting. 
 #' However, random forests don't search for the single best split in the data.
-#' Instead, they search for the best split among a random subset of featuresvar
+#' Instead, they search for the best split among a random subset of features 
 #' 
 #' 
 tree_randomForest <- train(Species~.,
@@ -138,9 +139,20 @@ iris_results <- iris_results %>%
   )
 
 
+
 #' Get the importance of each variable with
 importance <- varImp(tree_randomForest, scale=FALSE)
+# 
+# This tells us how much each variable decreases the average Gini index, a measure of how important the variable is to the model. Essentially, it estimates the impact a variable has on the model by comparing prediction accuracy rates for models with and without the variable. Larger values indicate higher importance of the variable. Here we see that the gender variable Sexmale is most important.
+# http://cfss.uchicago.edu/stat004_decision_trees.html
 
+
+
+# below does out of bag
+age_sex_rf <- train(Survived ~ Age + Sex, data = titanic_rf_data,
+                    method = "rf",
+                    ntree = 200,
+                    trControl = trainControl(method = "oob"))
 
 #'## Boosting
 #' Boosted models are ensemble models that are trained sequentially - each one tries to fix the errors of the one before it.
@@ -181,6 +193,13 @@ importance <- varImp(tree_randomForest, scale=FALSE)
 #' 
 #' 
 #' XGBoost
+#' https://cran.r-project.org/web/packages/xgboost/vignettes/xgboostPresentation.html
+#' https://machinelearningmastery.com/gentle-introduction-xgboost-applied-machine-learning/
+#' http://xgboost.readthedocs.io/en/latest/model.html
+#' 
+#' Implements gradient boosting, using regularised model formulation to control for overfitting
+#' Also, is super fast as it tries to optimise your computer's resources
+#' 
 #' 
 #' 
 #' 
