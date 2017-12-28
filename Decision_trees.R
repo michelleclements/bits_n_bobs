@@ -21,16 +21,16 @@ library(rpart.plot) # for plotting decision trees
 theme_set(theme_classic(base_size = 12)) # setting options for graphs
 
 
-#' We're going to use the iris dataset to look at regression trees
-#' We're not going to bother splitting into training and testing for now, as we'll be looking at other methods later
+#' We're going to use the mushroom dataset to look at regression trees
+#' We're just going to read in the training dataset created previously
 #' To keep things simple, we're just going to use petal length and petal width as predictor vars
-iris_petal <- iris %>% select(Species, Petal.Length, Petal.Width)
+mush <- read_csv("data/training_raw.csv")
 
 
 #' run a very simple tree
-tree_simple <- train(Species ~., # species is the response variable
+tree_simple <- train(class ~., # class is the response variable
                      method = "rpart", 
-                     data = iris_petal
+                     data = mush
                      )
 
 
