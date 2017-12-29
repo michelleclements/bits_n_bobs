@@ -35,7 +35,8 @@ mush <- read_csv("data/mushrooms.csv")
 #' ## Quick look at the data
 glimpse(mush)
 
-#' kchkankgek all - in names to underkskcore
+#' change all - in names to underscore
+names(mush) <- str_replace_all(names(mush), "-", "_")
 
 #' There's 8,124 observations and 23 variables. Everything looks to be categorical. 
 #' 
@@ -50,7 +51,7 @@ mush %>%
 
 
 #' veil-type only has one value so we'll remove it
-mush <- select(mush -veil-type)
+mush <- select(mush, -veil_type)
 
 #' ## Create a test dataset
 #' Randomly select 20% of the data to be left aside for final testing
@@ -78,10 +79,19 @@ training %>%
   geom_bar() +
   guides(fill=FALSE)
 
-
+#' ### Correlations
 
 #' As all variables are categorical, we don't need to centre.  
 #' Separate categorical vars out to the design matrix using recipes
-training_des <- recipe(class ~ . , data = training)
+#' #' leave this bit for now - but I think you can use it for correlations
+#' training_des <- recipe(class ~ . , data = training)
+#' library(gplots)
+#' balloonplot(y = mush, x = class, main ="class", xlab ="", ylab="",
+#'             label = FALSE, show.margins = FALSE)
 #' 
+#' http://www.sthda.com/english/wiki/chi-square-test-of-independence-in-r
+#' library("graphics")
+#' mosaicplot(dt, shade = TRUE, las=2,
+#'            main = "housetasks")
+
 #' 
