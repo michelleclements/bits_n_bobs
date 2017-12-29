@@ -80,8 +80,39 @@ training %>%
   guides(fill=FALSE)
 
 #' ### Correlations
+#' 
+#' To do correlations, categorical variables need to be separated out into their parts. 
 
-#' As all variables are categorical, we don't need to centre.  
+mush_dsgn_mtx <- model.matrix( ~ .-1, data = mush)
+
+library(corrplot)
+#' Then get the correlation matrix between all variables
+mush_corr <- cor(mush_dsgn_mtx)
+
+#' can plot with corrplot
+corrplot::corrplot(mush_corr, method = "square")
+
+
+#' Make into a dataframe
+mush_corr_df <- as.data.frame(as.table(mush_corr), stringsAsFactors = F)
+
+#' add names and sort
+names(mush_corr_df) <- c("var1", "var2", "corr")
+
+#' remove diagonals
+mush_corr_df <- filter(mush_corr_df, !(var1 == var2))
+
+#' remove duplicates
+mush_corr_df <- mush_corr_df %>% 
+  mutate(vars_corr = ifelse(var1 < var2, paste(var1, var2, sep = "/"), paste(var2, var1, sep = "/"))) %>% 
+  filter(!duplicated(vars_corr)) %>% 
+  arrange(desc(abs(corr)))
+
+
+#' plot which correlates with class
+mush_corr_class <- filter(mush_corr_df, var1 == "class" | var2 == "class")
+
+ß#' As all variables are categorical, we don't need to centre.  
 #' Separate categorical vars out to the design matrix using recipes
 #' #' leave this bit for now - but I think you can use it for correlations
 #' training_des <- recipe(class ~ . , data = training)

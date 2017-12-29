@@ -206,6 +206,7 @@ importanceOOb <- varImp(tree_randomForestOob, scale=FALSE)
 #' http://xgboost.readthedocs.io/en/latest/model.html
 #' 
 #' Implements gradient boosting, using regularised model formulation to control for overfitting
+#' Very good explanation is available here http://xgboost.readthedocs.io/en/latest/model.html
 #' Also, is super fast as it tries to optimise your computer's resources
 #' ### Preparing data for XGBoost
 #' XGBoost needs the   
