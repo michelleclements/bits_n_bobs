@@ -7,10 +7,10 @@
 #' ## Overview & resources
 #' This is my notes on decision trees
 #' 
-#' I have borrowed heavily from 
-#' * Hands-On machine learning with scikit-learn and tensorflow by Aurelien Geron
-#' * https://rstudio-pubs-static.s3.amazonaws.com/195428_16074a4e980747c4bc05af6c0bb305a9.html
-#' This one could be useful: https://rpubs.com/saqib/rpart
+#' I have borrowed heavily from  
+#' * Hands-On machine learning with scikit-learn and tensorflow by Aurelien Geron  
+#' * https://rstudio-pubs-static.s3.amazonaws.com/195428_16074a4e980747c4bc05af6c0bb305a9.html  
+#' This site could be useful: https://rpubs.com/saqib/rpart  
 #' 
 #' 
 #' ## Building a single decision tree using Caret
@@ -25,8 +25,7 @@ theme_set(theme_classic(base_size = 12)) # setting options for graphs
 
 
 #' We're going to use the mushroom dataset to look at regression trees
-#' We're just going to read in the training dataset created previously
-#' To keep things simple, we're just going to use petal length and petal width as predictor vars
+#' We're just going to read in the training dataset created previously in mushroom_data_investigation.R
 mush <- read_csv("data/training_raw.csv")
 
 
@@ -43,14 +42,14 @@ prp(tree_simple$finalModel,
     digits = 3 # display 3 digits
     )
 
-#' look at output using name$finalModel
-#' the * shows the terminal (or leaf) nodes which are the final bucket  
-#' You can follow down the numbered nodes to the very bottom  
-#' the first part shows the decision rule (or 'root' for the very bottom)  
-#' The next number shows how many sampes fall into this bucket (e.g. leaf 6 has 54 samples)  
-#' The following number shows how many samples are misclassified (e.g. leaf 6 has 5 of 54 samples misclassified)  
-#' The text shows the classification assigned to the leaf (e.g. node 6 is assigned 'versicolor')  
-#' The numbers in brackets show what proportion of samples in the bucket are of each class - this can be seen as the probability that any given sample in this bucket is each class.   
+#'* look at output using name$finalModel  
+#'* the asterix shows the terminal (or leaf) nodes which are the final bucket   
+#'* You can follow down the numbered nodes to the very bottom  
+#'* the first part shows the decision rule (or 'root' for the very bottom)  
+#'* The next number shows how many sampes fall into this bucket (e.g. leaf 6 has 444 samples)  
+#'* The following number shows how many samples are misclassified (e.g. leaf 6 has 28 of 444 samples misclassified)  
+#'* The text shows the classification assigned to the leaf (e.g. node 6 is assigned 'e')  
+#'* The numbers in brackets show what proportion of samples in the bucket are of each class - this can be seen as the probability that any given sample in this bucket is each class.   
 #' 
 
 tree_simple$finalModel
@@ -65,31 +64,33 @@ mush_results <- mush %>%
 
 #'## Notes on basic decision trees
 #'* decision trees don't require feature scaling or centering  
-#' The tree above uses the CART algorithm - Classification And Regression Tree
+#'* The tree above uses the CART algorithm - Classification And Regression Tree
 #'*  CART  only produces yes/no options - a node can only have two children  
-#' CART searches for the variable and threshold that produces the purest two subsets
-#' It stops when it reaches the maximum depth parameter or when it cannot find a split that will reduce impurity
+#'* CART searches for the variable and threshold that produces the purest two subsets
+#'* It stops when it reaches the maximum depth parameter or when it cannot find a split that will reduce impurity
 #' 
 #' 
 #' 
 #' # Ensemble models
 #' Ensemble models are when different models are combined. 
 #' It's a popular addition to regression trees. There are two main ways to do ensemble models:  
+#' 
 #' 1. Train different types of models on the same data set - models have to be as different (independent) as possible
-#' #' Combining the results can be done in a two main ways:  
-#' a. Hard voting: each model gets a 'vote' and the class with the most vote wins
-#' b. Soft voting: average probability of each class across all models and pick the class with the highest average (needs probs to be outputted)
+#' 
+#' Combining the results can be done in a two main ways:  
+#' a. Hard voting: each model gets a 'vote' and the class with the most vote wins  
+#' b. Soft voting: average probability of each class across all models and pick the class with the highest average (needs probs to be outputted)  
 #' 
 #' 
 #' 2. Train the same type of model on different subsets of the dataset
 #' 
-#' Sampling can be:
-#' a. with replacement: bagging (bootstrap aggregating)
-#' b. without replacement: pasting
+#' Sampling can be:  
+#' a. with replacement: bagging (bootstrap aggregating)  
+#' b. without replacement: pasting  
 #' 
-#' Prediction can then be done onece the models are aggregated:
-#' 1. Statistical mode (same as hard voting) for classification
-#' 2. Average for regression
+#' Prediction can then be done onece the models are aggregated:  
+#' 1. Statistical mode (same as hard voting) for classification  
+#' 2. Average for regression  
 #' 
 #' 
 tree_bagged <- train(class ~., # class is the response variable
@@ -109,16 +110,16 @@ mush_results <- mush_results %>%
 #' 
 
 #' ## Random forests
-#' Random Forests use bagging/pasting. 
-#' However, random forests don't search for the single best split in the data.
-#' Instead, they search for the best split among a random subset of features 
+#'* Random Forests use bagging/pasting.  
+#'* However, random forests don't search for the single best split in the data.  
+#'* Instead, they search for the best split among a random subset of features and then aggregate.  
 #' 
 #' 
 tree_randomForest <- train(class~.,
                            data = mush,
                            method = "rf", # random forest
                            trControl = trainControl(method = "cv", # resampling method is cross validation 
-                                                    number = 5), # 5 splits in the corss validation
+                                                    number = 5), # 5 splits in the cross validation
                            prox = TRUE,
                            allowParallel = TRUE)
 print(tree_randomForest)
@@ -130,18 +131,23 @@ mush_results <- mush_results %>%
          correct_randomForest = predict_randomForest == class # create a true/false for whether prediction was correct
   )
 
-predict.train(tree_randomForest, newdata = mush, type = "prob")
+
+#' get probabilities of being in each class for first 10 obs in mush
+predict.train(tree_randomForest, newdata = mush, type = "prob")[1:10, ]
 
 #' Get the importance of each variable with
-importance <- varImp(tree_randomForest, scale=FALSE)
+varImp(tree_randomForest, scale=FALSE)
 # 
-# This tells us how much each variable decreases the average Gini index, a measure of how important the variable is to the model. Essentially, it estimates the impact a variable has on the model by comparing prediction accuracy rates for models with and without the variable. Larger values indicate higher importance of the variable. Here we see that the gender variable Sexmale is most important.
+#' This tells us how much each variable decreases the average Gini index, a measure of how important the variable is to the model. 
+#' Essentially, it estimates the impact a variable has on the model by comparing prediction accuracy rates for models with and without the variable. 
+#' Larger values indicate higher importance of the variable. Here we see that the gender variable Sexmale is most important.
 # http://cfss.uchicago.edu/stat004_decision_trees.html
 
 tree_randomForest$finalModel
 
 
-#'### Random forest with out of bag sampling - boostrapped samples with validaton on approx 1/3 of samples not included in bootstrap
+#'### Random forest with out of bag sampling
+#' bootstrapped samples with validaton on approx 1/3 of samples not included in bootstrap
 
 # below does out of bag
 tree_randomForestOob <- train(class ~ ., data = mush,
@@ -160,7 +166,7 @@ mush_results <- mush_results %>%
   )
 
 #' Get the importance of each variable with
-importanceOOb <- varImp(tree_randomForestOob, scale=FALSE)
+varImp(tree_randomForestOob, scale=FALSE)
 
 #'## Boosting
 #' Boosted models are ensemble models that are trained sequentially - each one tries to fix the errors of the one before it.
@@ -340,7 +346,7 @@ chisq.test(mush$odor == "n", mush$class)
 rocr_xgb <- ROCR::prediction(predictions = mush_results$predict_xgb, 
                              labels = mush_response)
 
-performance(pred,"tpr","fpr")
+performance(rocr_xgb,"tpr","fpr")
 
 performance_xgb <- data_frame(cut = rocr_xgb@cutoffs[[1]], 
                               fpr = performance(rocr_xgb, "tpr")@y.values[[1]], 
@@ -357,21 +363,6 @@ ggplot(performance_xgb, aes(x = cut)) + geom_line(aes(y = prec)) + geom_line(aes
 
 performance(rocr_xgb, "tpr")
 
-plot(ROCR::performance(prediction.obj	 = performance_xgb,
-                 measure = 'tpr',
-                 x.measure = 'fpr'))
-
-ROCRpred <- prediction(pred,obs)
 
 
 
-
-library(precrec)
-
-
-# Calculate ROC and Precision-Recall curves
-a <- precrec::evalmod(scores = mush_results$predict_xgb, labels = mush_results$response)
-
-
-summary(mush_results$predict_xgb[mush_results$predict_xgb < 0.5])
-summary(mush_results$predict_xgb[mush_results$predict_xgb > 0.5])
